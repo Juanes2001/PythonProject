@@ -230,3 +230,5 @@ if __name__ == "__main__" :
             print ("PROGRAMA TERMINADO\n")
             fig.show()
             break
+
+            hex()

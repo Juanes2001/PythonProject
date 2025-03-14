@@ -231,4 +231,3 @@ if __name__ == "__main__" :
             fig.show()
             break
 
-            hex()

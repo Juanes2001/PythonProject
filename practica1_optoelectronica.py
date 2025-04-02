@@ -184,8 +184,8 @@ if __name__ == "__main__" :
         title="Espectro LED Blanco",
         plot_bgcolor="#FFFFFF",
         hovermode="x",
-        hoverdistance=100,  # Distance to show hover label of data point
-        spikedistance=1000,  # Distance to show spike
+        hoverdistance   = 100,  # Distance to show hover label of data point
+        spikedistance   = 1000,  # Distance to show spike
         xaxis=dict(
             title="Longitud de onda (nm)",
             linecolor="#BCCCDC",

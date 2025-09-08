@@ -7,13 +7,11 @@ from scipy import integrate
 
 # definicion del dominio a usar -1<= x <= 1
 
-res = 1000
-xdom = np.linspace(start=-1,stop=1,num=res)
 
 
 #definicion de una función que me entrega una base de funciones polinomicas X^n
-def base(n):
-    fun =lambda var: np.array([var**i for i in range(n)])
+def base(var,n):
+    fun = np.array([var**i for i in range(n)])
     return fun
 
 #definición del algoritmo de Gram_Schmidt, la entrada será una base de funciones
@@ -21,21 +19,23 @@ def Gram(dom, fun):
     # Queremos retornar ya la base pero ortogonalizada, por lo que el retorno sera otro vector de funciones
 
     # primero leemos cuantas funciones de la base son:
-    len_base = len(fun(0))
+    len_base = len()
     fun_vec = [lambda var, i=i: fun(var)[i] for i in range(len_base)]
     #aplicamos el algoritmo definiendo cada funcion por separado y luego uniendolas al final:
-    arr_func = [lambda var: fun(var)[0]] # almacenamos la primera función
-    acum =np.array([])
+    arr_func = [lambda var: fun(var)[0]] # almacenamos la primera función de la nueva base ortogonal
+    acum =[np.array([])]
     for k in range (1,len_base):
         for j in range(k):
 
             cross_point= dot(dom,arr_func[j],fun_vec[k]) # producto punto cruzado
             norm_sqr = dot(dom,arr_func[j],arr_func[j]) # norma al cuadrado
 
-            acum.concatenate((acum,np.array([lambda var: (cross_point/norm_sqr)*arr_func[j](var)])))
+
+            acum[k-1] = np.concatenate((acum[k-1],np.array([lambda var: (cross_point/norm_sqr)*arr_func[j](var)])))
 
 
-        arr_func.append(lambda var: fun(var)[k] - sum(acum[:](var)))
+        arr_func.append(lambda var, k=k: fun(var)[k] - np.array([f(var) for f in acum[k-1]]).sum())
+        acum.append(np.array([]))
 
     fun_ort = lambda var: np.array([arr_func[i](var) for i in range(len_base)])
 
@@ -69,16 +69,7 @@ def dot(dom,fun1,fun2):
     result1, err1 = integrate.quad(lambda var: fun1(var)*fun2(var), dom[0], dom[1])
     return result1
 
-#definimos la función para plotear en una grafica o conjunto de graficas
-def plot(dom, fun):
 
-    len_base = len(fun(0))
-    fig, ax = ptl.subplots()
-    for i in range(len_base):
-        ax.plot(dom, fun(dom)[i])
-
-    ptl.grid()
-    ptl.show()
 
 
 

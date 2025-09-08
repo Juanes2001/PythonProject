@@ -3,7 +3,7 @@ import matplotlib.pyplot as ptl
 import math
 from scipy import integrate
 
-res = 10000
+res = 10
 n=6
 x = np.linspace(start=-1,stop=1,num=res)
 
@@ -11,14 +11,13 @@ dom = [-1,1]
 
 
 #definicion de una función que me entrega una base de funciones polinomicas X^n
-def base(n):
-    fun = lambda var: np.array([var**i for i in range(n)])
+def base(var,n):
+    fun = np.array([var**i for i in range(n)])
     return fun
 
-fun = base(n)
+fun = base(x,n)
 
-arr_fun = [lambda var, i=i: fun(var)[i] for i in range(n)]
-
+print(fun)
 
 def dot(dom,fun1,fun2):
 
@@ -46,12 +45,14 @@ def dot(dom,fun1,fun2):
 #
 # print (results)
 
-fig, ax = ptl.subplots()
-ax.plot(x,fun(x)[0])
-ax.plot(x, fun(x)[1])
-ax.plot(x, fun(x)[2])
-ax.plot(x, fun(x)[3])
-ptl.grid()
+# fig, ax = ptl.subplots()
+# ax.plot(x,fun(x)[0])
+# ax.plot(x, fun(x)[1])
+# ax.plot(x, fun(x)[2])
+# ax.plot(x, fun(x)[3])
+# ptl.grid()
 
+fun_sum = lambda var: np.array([f(var) for f in arr_fun]).sum()
 
-ptl.show()
+print(fun_sum(1))
+

@@ -3,7 +3,7 @@ import matplotlib.pyplot as ptl
 import math
 from scipy import integrate
 
-res = 10
+res = 1000000
 n=6
 x = np.linspace(start=-1,stop=1,num=res)
 
@@ -17,12 +17,15 @@ def base(var,n):
 
 fun = base(x,n)
 
-print(fun)
+print(len(fun))
 
 def dot(dom,fun1,fun2):
 
-    result1, err1 = integrate.quad(lambda var: fun1(var)*fun2(var), dom[0], dom[1])
-    return result1
+    inte = integrate.simpson(fun1*fun2,dom)
+    return inte
+
+print(dot(x,fun[1],fun[4]))
+
 
 # print(fun[1])
 
@@ -52,7 +55,4 @@ def dot(dom,fun1,fun2):
 # ax.plot(x, fun(x)[3])
 # ptl.grid()
 
-fun_sum = lambda var: np.array([f(var) for f in arr_fun]).sum()
-
-print(fun_sum(1))
 

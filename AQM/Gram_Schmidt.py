@@ -1,7 +1,6 @@
 # Aqui se encuentra todo el algoritmo de ortogonalizacion de Gram Schmidt en el cual
 # se usan funciones establecidas en functions.py para facilitar el volumen de codigo y solo
 # permitir en este archivo el calculo sencillo de ortogonalizacion de bases.
-import matplotlib.pyplot as plt
 
 # un primer paso sera traer todas las herramientas creadas para la ortogonalización
 
@@ -72,7 +71,7 @@ for i in range(num_base_functions):
 
 #TABLA DE PRODUCTOS CRUZADOS CON LA BASE DE ortogonormal hallada
 
-data_ortonorm = pd.DataFrame(cross_dots_norm,columns=["e0", "e1", "e2", "e3", "e4"],index=["e0", "e1", "e2", "e3", "e4"])
+data_ortonorm = pd.DataFrame(cross_dots_norm,columns=[r"$\\xi_{0}$", "e1", "e2", "e3", "e4"],index=["e0", "e1", "e2", "e3", "e4"])
 
 data_ortonorm_norms = pd.DataFrame(cross_dots_norm.diagonal(),index=["e0", "e1", "e2", "e3", "e4"])
 
@@ -81,7 +80,20 @@ print(tabulate(data_ortonorm, headers="keys", tablefmt="fancy_grid"))
 print(tabulate(data_ortonorm_norms, tablefmt="fancy_grid"))
 
 #Mostramos las graficas
-plt.show()
+ptl.show()
+
+fun_cossin = np.cos(fn.xdom)*np.sin(fn.xdom)
+
+fun_cossin_base =  np.array([])
+
+for i in range(num_base_functions):
+
+    fun_cossin_base = fun_cossin_base + fn.dot(fn.xdom,fun_cossin,base_ort[i]) * base_ort[i]
+
+
+
+
+
 
 
 

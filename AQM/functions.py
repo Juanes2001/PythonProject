@@ -59,11 +59,30 @@ def norm(dom,fun_ort):
     return fun_ort_norm
 
 
+
 #definimos la funcion producto punto:
 def dot(dom,fun1,fun2):
 
     inte = integrate.simpson(fun1*fun2,dom)
     return inte
+
+
+#////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#Definimos la funcion delta de croniquer
+def dcroc(i, j):
+    if i == j:
+        return 1
+    else:
+        return 0
+
+
+def baseRn(dim):
+    base = []
+    for i in range(1, dim + 1):
+        base.append([dcroc(j, i) for j in range(1, dim + 1)])
+    return np.array(base)
 
 
 

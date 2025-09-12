@@ -112,8 +112,6 @@ Su_B = fn.Btransform_old_new(base_old,base_newfor_A)
 
 Aprime = Su_B.T@A@Su_B
 
-print (f"A'= \n{np.round(Aprime,3)}")
-
 #Hacemos lo mismo para B pero usando la base de autoestados de A
 
 base_newfor_B = [phiA1,phiA2,phiA3]
@@ -125,3 +123,9 @@ Bprime = Su_A.T@B@Su_A
 
 print (f"A'= \n{np.round(Aprime,2)}")
 print (f"B'= \n{np.round(Bprime,2)}")
+
+
+# Como el sub espacio de los vectores del autovalor degenerado no es ortogonal, se busca llegar a una combinacion lineal
+# de estos vectores para que puedan ser autoestados tanto de B como de A debido al teorema 4. Tomamos solo los autoestados de B
+# con autovalor degenerado y aplicamos el metodo de Gram-Schmidt
+

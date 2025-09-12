@@ -19,29 +19,35 @@ def base(var,n):
 def Gram(dom, fun):
     # Queremos retornar ya la base pero ortogonalizada, por lo que el retorno sera otro vector de funciones
 
-    # primero leemos cuantas funciones de la base son:
-    len_base = len(fun)
-    #aplicamos el algoritmo definiendo cada funcion por separado y luego uniendolas al final:
-    arr_func = [fun[0]] # almacenamos la primera función de la nueva base ortogonal
-    acum = np.zeros(len(dom))
-    for k in range (1,len_base):
-        for j in range(k):
-
-            cross_point= dot(dom,arr_func[j],fun[k]) # producto punto cruzado
-            norm_sqr = dot(dom,arr_func[j],arr_func[j]) # norma al cuadrado
-
-
-            acum = acum + np.array((cross_point/norm_sqr)*arr_func[j])
-
-
-        arr_func.append(fun[k] - acum)
+    if dom != None :
+        # Si estamos aqui es porque queremos ortogonalizar unos vectores en forma de funciones.
+        # primero leemos cuantas funciones de la base son:
+        len_base = len(fun)
+        #aplicamos el algoritmo definiendo cada funcion por separado y luego uniendolas al final:
+        arr_func = [fun[0]] # almacenamos la primera función de la nueva base ortogonal
         acum = np.zeros(len(dom))
+        for k in range (1,len_base):
+            for j in range(k):
 
-    fun_ort = np.array(arr_func)
-    base_ortN = norm(dom,fun_ort) ## Normalizamos la base resultante ya ortogonal
+                cross_point= dot(dom,arr_func[j],fun[k]) # producto punto cruzado
+                norm_sqr = dot(dom,arr_func[j],arr_func[j]) # norma al cuadrado
 
-    return base_ortN
 
+                acum = acum + np.array((cross_point/norm_sqr)*arr_func[j])
+
+
+            arr_func.append(fun[k] - acum)
+            acum = np.zeros(len(dom))
+
+        fun_ort = np.array(arr_func)
+        base_ortN = norm(dom,fun_ort) ## Normalizamos la base resultante ya ortogonal
+
+        return base_ortN
+    else:
+        # Si estamos aqui es porque queremos ortogonalizar un conjunto de vectores de Rn y no un espacio de funciones.
+
+        # fun contendra todos los vectores a ortogonalizar
+        return 0
 
 
 #definimos la función normalizar

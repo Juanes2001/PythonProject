@@ -84,6 +84,16 @@ def baseRn(dim):
         base.append([dcroc(j, i) for j in range(1, dim + 1)])
     return np.array(base)
 
+#//////////////////////////////////////////////////////////////////////////////////////////////
+
+def Btransform_old_new(old,new):
+    dim = len(old)
+    S = []
+    for i in range(dim):
+        S.append([(old[i].T @ new[j]).sum() for j in range(dim)])
+    S =  np.array(S)
+    return S
+
 
 
 

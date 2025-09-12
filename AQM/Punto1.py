@@ -44,13 +44,13 @@ eigvals1, eigvec1 = np.linalg.eig(B)
 b1 = eigvals1[0]
 b2 = eigvals1[1]
 
-phi1 = (eigvec1.T)[0].T
-phi2 = (eigvec1.T)[1].T
+phiB1 = (eigvec1.T)[0].T
+phiB2 = (eigvec1.T)[1].T
 
 
-print (phi1,"\n",(B@phi1)/b1)
+print (phiB1,"\n",(B@phiB1)/b1)
 print("#####################")
-print (phi2,"\n",(B@phi2)/b2)
+print (phiB2,"\n",(B@phiB2)/b2)
 
 #Si A*phi1 y A*phi2 son tambien autovectores de B significa que phi1 y phi2 son autoestados de A
 #Por lo que hacemos el mismo procedimiento para A
@@ -65,9 +65,9 @@ a2 = eigvals2[1]
 #Sin usar los autovectores que me entregan para A, usando solo los de B, veamos si nos da iguales a los
 # autovectores de B
 
-print (phi1,"\n",(A@phi1)/a1)
+print (phiB1,"\n",(A@phiB1)/a1)
 print("#####################")
-print (phi2,"\n",(A@phi2)/a2)
+print (phiB2,"\n",(A@phiB2)/a2)
 
 #Vemos que en efecto obtenemos los mismos autovectores de B usando los obtenidos para B suponiendo que son
 # los mismos autovectores en A, esto es debido a que tanto el operador A como B son matrices hermiticas y ademas

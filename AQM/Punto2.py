@@ -63,12 +63,12 @@ eigvecA  = np.round(eigvecA,3)
 #Veamos que en efecto se cumple que hayamos los autovectores con sus autovalores
 
 a1 = eigvalsA[0]
-a2 = eigvalsA[1]
-a3 = eigvalsA[2]
+a2 = eigvalsA[2]
+a3 = eigvalsA[1]
 
 phiA1 = np.array([(eigvecA.T)[0]]).T
-phiA2 = np.array([(eigvecA.T)[1]]).T
-phiA3 = np.array([(eigvecA.T)[2]]).T
+phiA2 = np.array([(eigvecA.T)[2]]).T
+phiA3 = np.array([(eigvecA.T)[1]]).T
 
 print(f"eigen values of A = {np.array([a1,a2,a3])}")
 
@@ -81,13 +81,13 @@ eigvecB  = np.round(eigvecB,3)
 
 ## Hacemos lo mismo pero para B
 
-b1 = eigvalsB[0]
-b2 = eigvalsB[1]
-b3 = eigvalsB[2]
+b1 = eigvalsB[1]
+b2 = eigvalsB[2]
+b3 = eigvalsB[0]
 
-phiB1 = np.array([(eigvecB.T)[0]]).T
-phiB2 = np.array([(eigvecB.T)[1]]).T
-phiB3 = np.array([(eigvecB.T)[2]]).T
+phiB1 = np.array([(eigvecB.T)[1]]).T
+phiB2 = np.array([(eigvecB.T)[2]]).T
+phiB3 = np.array([(eigvecB.T)[0]]).T
 
 print(f"eigen values of B = {np.array([b1,b2,b3])}")
 
@@ -98,7 +98,7 @@ print(f"eigen vectors of B =\n {np.hstack(   (   phiB1,np.column_stack((phiB2,ph
 # la base nueva de autoestados de la diagonalizacion de B
 
 base_old = [u1,u2,u3]
-base_newfor_A = [phiB3,phiB2,phiB1]
+base_newfor_A = [phiB1,phiB2,phiB3]
 
 Su_B = fn.Btransform_old_new(base_old,base_newfor_A)
 
@@ -106,7 +106,7 @@ Aprime = Su_B.T@A@Su_B
 
 #Hacemos lo mismo para B pero usando la base de autoestados de A
 
-base_newfor_B = [phiA1,phiA3,phiA2]
+base_newfor_B = [phiA1,phiA2,phiA3]
 
 Su_A = fn.Btransform_old_new(base_old,base_newfor_B)
 
@@ -140,13 +140,13 @@ print (f"B'= \n{np.round(Bprime,2)}")
 
 eigvalsAprime, eigvecAprime =  np.linalg.eig(Aprime)
 
-aprime1 = round(eigvalsAprime[0],2)
+aprime1 = round(eigvalsAprime[2],2)
 aprime2 = round(eigvalsAprime[1],2)
-aprime3 = round(eigvalsAprime[2],2)
+aprime3 = round(eigvalsAprime[0],2)
 
-phiAprime1 = np.round(np.array([(eigvecAprime.T)[0]]).T,2)
+phiAprime1 = np.round(np.array([(eigvecAprime.T)[2]]).T,2)
 phiAprime2 = np.round(np.array([(eigvecAprime.T)[1]]).T,2)
-phiAprime3 = np.round(np.array([(eigvecAprime.T)[2]]).T,2)
+phiAprime3 = np.round(np.array([(eigvecAprime.T)[0]]).T,2)
 
 print(f"eigen values of A' = {np.array([aprime1,aprime2,aprime3])}")
 

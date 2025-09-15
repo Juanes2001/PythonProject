@@ -2,11 +2,10 @@
 # se tratará la base como si fueran los vectores  de R3, osea e1 , e2 y e3, por lo que el Ket
 # estara asociado  con el vector columna y el bra estara asociado al vector fila.
 
-from mpmath import eig
 from sympy.core.random import random
 
 #Importamos las librerias y funciones que podamos usar sobre la marcha
-import functions as fn
+from AQM.Tarea1 import functions as fn
 import numpy as np
 
 

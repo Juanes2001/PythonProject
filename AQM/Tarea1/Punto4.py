@@ -8,7 +8,7 @@ import math
 from sympy.core.random import random
 
 #Importamos las librerias y funciones que podamos usar sobre la marcha
-import functions as fn
+from AQM.Tarea1 import functions as fn
 import numpy as np
 
 baseR2 = fn.baseRn(2)
@@ -88,5 +88,12 @@ print(A2)
 u1auto = np.round(Udag(theta)@A1,2)
 u2auto = np.round(Udag(theta)@A2,2)
 
+phiA1 = np.round(U(theta)@u1,2)
+phiA2 = np.round(U(theta)@u2,2)
+
+
 print(u1auto)
 print(u2auto)
+
+print(phiA1)
+print(phiA2)

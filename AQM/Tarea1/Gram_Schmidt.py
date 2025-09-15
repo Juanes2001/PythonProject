@@ -4,7 +4,7 @@
 
 # un primer paso sera traer todas las herramientas creadas para la ortogonalización
 
-import functions as fn
+from AQM.Tarea1 import functions as fn
 import numpy as np
 import matplotlib.pyplot as ptl
 import pandas as pd

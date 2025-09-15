@@ -9,7 +9,7 @@ aplicar para cada operador <i|a|j>,<i|adag|j>,<i|N|j>
 import math
 
 #Importamos las librerias y funciones que podamos usar sobre la marcha
-import functions as fn
+from AQM.Tarea1 import functions as fn
 import numpy as np
 
 #~Definimos una base de R5 ortogonal

@@ -106,7 +106,7 @@ print(phiB3)
 # la base nueva de autoestados de la diagonalizacion de B
 
 base_old = [u1,u2,u3]
-base_newfor_A = [phiB1,phiB2,phiB3]
+base_newfor_A = [phiB3,phiB2,phiB1]
 
 Su_B = fn.Btransform_old_new(base_old,base_newfor_A)
 
@@ -114,7 +114,7 @@ Aprime = Su_B.T@A@Su_B
 
 #Hacemos lo mismo para B pero usando la base de autoestados de A
 
-base_newfor_B = [phiA1,phiA2,phiA3]
+base_newfor_B = [phiA1,phiA3,phiA2]
 
 Su_A = fn.Btransform_old_new(base_old,base_newfor_B)
 
@@ -129,3 +129,53 @@ print (f"B'= \n{np.round(Bprime,2)}")
 # de estos vectores para que puedan ser autoestados tanto de B como de A debido al teorema 4. Tomamos solo los autoestados de B
 # con autovalor degenerado y aplicamos el metodo de Gram-Schmidt
 
+# Recordemos que tenemos organizados los siguientes autovectores como sigue:
+
+"""
+       Para A definida en la base de B en donde se halla la degeneración, se tiene:
+       
+       lambdaB1 = 4, [0.707,0.707,0] || lambdaB2 = 2, [-0.707,0.707,0] || lambdaB3 = 2, [0,0,1]
+        
+        
+       Para B definida en la base de A en donde no se halla la degeneración, se tiene:
+       
+       lambdaA2 = 2, [-0.707,-0.707,0] || lambdaA1 = -1.414, [0.5,-0.5,0.707] || lambdaA3 = 1.414, [-0.5,0.5,0.707]
+
+
+        Con esto ya definido, solo hay que tomar el subconjunto de las columnas que representan a los autoestados degenerados
+"""
+
+
+eigvalsAprime, eigvecAprime =  np.linalg.eig(Aprime)
+
+aprime1 = round(eigvalsAprime[0],2)
+aprime2 = round(eigvalsAprime[1],2)
+aprime3 = round(eigvalsAprime[2],2)
+
+phiAprime1 = np.round(np.array([(eigvecAprime.T)[0]]).T,2)
+phiAprime2 = np.round(np.array([(eigvecAprime.T)[1]]).T,2)
+phiAprime3 = np.round(np.array([(eigvecAprime.T)[2]]).T,2)
+
+print(aprime1,aprime2,aprime3)
+
+print(phiAprime1)
+print(phiAprime2)
+print(phiAprime3)
+
+
+
+eigvalsBprime, eigvecBprime =  np.linalg.eig(Bprime)
+
+bprime1 = round(eigvalsBprime[0],2)
+bprime2 = round(eigvalsBprime[1],2)
+bprime3 = round(eigvalsBprime[2],2)
+
+phiBprime1 = np.round(np.array([(eigvecBprime.T)[0]]).T,2)
+phiBprime2 = np.round(np.array([(eigvecBprime.T)[1]]).T,2)
+phiBprime3 = np.round(np.array([(eigvecBprime.T)[2]]).T,2)
+
+print(bprime1,bprime2,bprime3)
+
+print(phiBprime1)
+print(phiBprime2)
+print(phiBprime3)

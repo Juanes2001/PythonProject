@@ -47,7 +47,24 @@ def Gram(dom, fun):
         # Si estamos aqui es porque queremos ortogonalizar un conjunto de vectores de Rn y no un espacio de funciones.
 
         # fun contendra todos los vectores a ortogonalizar
-        return 0
+        len_base = len(fun)
+        # aplicamos el algoritmo definiendo cada funcion por separado y luego uniendolas al final:
+        arr_func = [fun[0]]  # almacenamos la primera función de la nueva base ortogonal
+        acum = np.zeros(len(fun[0]))
+        for k in range(1, len_base):
+            for j in range(k):
+                cross_point = dot(None, arr_func[j], fun[k])  # producto punto cruzado
+                norm_sqr = dot(None, arr_func[j], arr_func[j])  # norma al cuadrado
+
+                acum = acum + np.array((cross_point / norm_sqr) * arr_func[j])
+
+            arr_func.append(fun[k] - acum)
+            acum = np.zeros(len(fun[0]))
+
+        fun_ort = np.array(arr_func)
+        base_ortN = norm(dom, fun_ort)  ## Normalizamos la base resultante ya ortogonal
+
+        return base_ortN
 
 
 #definimos la función normalizar
@@ -55,23 +72,35 @@ def Gram(dom, fun):
 def norm(dom,fun_ort):
 
     #contamos cual es la dimension de la base
-    len_base = len(fun_ort)
-    norm_sqr = []
-    for i in range(len_base):
+    if dom != None:
+        len_base = len(fun_ort)
+        norm_sqr = []
+        for i in range(len_base):
 
-        norm_sqr.append(math.sqrt(dot(dom,fun_ort[i],fun_ort[i])))
+            norm_sqr.append(math.sqrt(dot(dom,fun_ort[i],fun_ort[i])))
 
-    fun_ort_norm = np.array([fun_ort[i]/norm_sqr[i] for i in range(len_base)])
-    return fun_ort_norm
+        fun_ort_norm = np.array([fun_ort[i]/norm_sqr[i] for i in range(len_base)])
+        return fun_ort_norm
+    else:
+        #Si estamos aqui es porque queremos normalizar una base ortogonalizada de Rn
+        len_base = len(fun_ort)
+        norm_sqr = []
+        for i in range(len_base):
+            norm_sqr.append(math.sqrt(dot(None, fun_ort[i], fun_ort[i])))
 
+        fun_ort_norm = np.array([fun_ort[i] / norm_sqr[i] for i in range(len_base)])
+        return fun_ort_norm
 
 
 #definimos la funcion producto punto:
 def dot(dom,fun1,fun2):
-
-    inte = integrate.simpson(fun1*fun2,dom)
-    return inte
-
+    if dom != None:
+        inte = integrate.simpson(fun1*fun2,dom)
+        return inte
+    else:
+        # SI estamos aqui es porque fun1 y fun2 se tratan de vectores
+        dot_prod = np.sum(fun1*fun2)
+        return dot_prod
 
 #////////////////////////////////////////////////////////////////////////////////////////////
 

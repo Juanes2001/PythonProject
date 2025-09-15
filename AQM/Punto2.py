@@ -8,10 +8,7 @@ from sympy.core.random import random
 #Importamos las librerias y funciones que podamos usar sobre la marcha
 import functions as fn
 import numpy as np
-import matplotlib.pyplot as ptl
-import pandas as pd
-from tabulate import tabulate
-import sympy as sp
+
 
 
 #Similar al punto 1  , definimos una base tridimensional
@@ -73,11 +70,9 @@ phiA1 = np.array([(eigvecA.T)[0]]).T
 phiA2 = np.array([(eigvecA.T)[1]]).T
 phiA3 = np.array([(eigvecA.T)[2]]).T
 
-print(a1,a2,a3)
+print(f"eigen values of A = {np.array([a1,a2,a3])}")
 
-print(phiA1)
-print(phiA2)
-print(phiA3)
+print(f"eigen vectors of A =\n{np.hstack(   (   phiA1,np.column_stack((phiA2,phiA3))    )   )}")
 
 eigvalsB, eigvecB =  np.linalg.eig(B)
 
@@ -94,12 +89,9 @@ phiB1 = np.array([(eigvecB.T)[0]]).T
 phiB2 = np.array([(eigvecB.T)[1]]).T
 phiB3 = np.array([(eigvecB.T)[2]]).T
 
-print(b1,b2,b3)
+print(f"eigen values of B = {np.array([b1,b2,b3])}")
 
-print(phiB1)
-print(phiB2)
-print(phiB3)
-
+print(f"eigen vectors of B =\n {np.hstack(   (   phiB1,np.column_stack((phiB2,phiB3))    )   ) }" )
 
 ##Lo que sigue es entonces representar la matriz de A usando la base de autoestados de B, y viceversa .
 #Para ello Aplicamos A' = SAS, en donde S se contruye como <ui|phiBj> en donde u es la base vieja y phiBj
@@ -156,11 +148,9 @@ phiAprime1 = np.round(np.array([(eigvecAprime.T)[0]]).T,2)
 phiAprime2 = np.round(np.array([(eigvecAprime.T)[1]]).T,2)
 phiAprime3 = np.round(np.array([(eigvecAprime.T)[2]]).T,2)
 
-print(aprime1,aprime2,aprime3)
+print(f"eigen values of A' = {np.array([aprime1,aprime2,aprime3])}")
 
-print(phiAprime1)
-print(phiAprime2)
-print(phiAprime3)
+print(np.hstack(   (   phiAprime1,np.column_stack((phiAprime2,phiAprime3))    )   )  )
 
 
 
@@ -174,8 +164,6 @@ phiBprime1 = np.round(np.array([(eigvecBprime.T)[0]]).T,2)
 phiBprime2 = np.round(np.array([(eigvecBprime.T)[1]]).T,2)
 phiBprime3 = np.round(np.array([(eigvecBprime.T)[2]]).T,2)
 
-print(bprime1,bprime2,bprime3)
+print(f"eigen values of B' = {np.array([bprime1,bprime2,bprime3])}")
 
-print(phiBprime1)
-print(phiBprime2)
-print(phiBprime3)
+print(np.hstack(   (   phiBprime1,np.column_stack((phiBprime2,phiBprime3))    )   )  )

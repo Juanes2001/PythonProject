@@ -130,13 +130,6 @@ def Btransform_old_new(old,new):
     return S
 
 
-#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-def cos(theta):
-    return math.cos(theta)
-
-def sin(theta):
-    return math.sin(theta)
 
 
 

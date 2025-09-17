@@ -66,11 +66,11 @@ print(D)
 
 print(f"lambda1 = {D[0][0]} y lambda2 = {D[1][1]}")
 
-# Para hallar los auto estados del operador A los hallamos en las columnas de la matriz Udag en este caso, osea la matriz
+# Para hallar los auto estados del operador A los hallamos en las columnas de la matriz U en este caso, osea la matriz
 # que se coloca a la izquierda de la matriz diagonal que acabamos de hallar.
 
 
-print(Udag(-theta))
+print(U(theta))
 
 #Comprobamos que efectivamente si son autovectores.
 

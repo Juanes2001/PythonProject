@@ -4,6 +4,7 @@ import numpy as np
 import math
 from scipy import integrate
 import sympy as sp
+from scipy import constants as const
 
 # definicion del dominio a usar -1<= x <= 1
 
@@ -138,7 +139,13 @@ def cos(theta):
 def sin(theta):
     return math.sin(theta)
 
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+def halm_t(order,H,t):
+    c = np.zeros((2, 2))
+    for i in range(order):
+        c = c + (1/math.factorial(i))*(np.linalg.matrix_power(H,i))*math.pow(t,i)*(1j)**i
+    return c
 
 
 

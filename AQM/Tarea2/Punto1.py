@@ -15,7 +15,7 @@ base = fn.baseRn(dim)
 
 u1 = np.array([base[0]]).T
 u2 = np.array([base[1]]).T
-
+ 
 # Definimos los estados no estacionarios:
 
 mas   = 1/math.sqrt(2) * (u1+u2)
@@ -46,7 +46,7 @@ def prob1(order,H,phi0,t):
     global mas
     hamilt = np.zeros((2, 2))
     for i in range(order):
-        hamilt = hamilt + (1 / math.factorial(i)) * (np.linalg.matrix_power(H, i)) * math.pow(t, i) * (1j) ** i
+        hamilt = hamilt + (1 / math.factorial(i)) * (np.linalg.matrix_power(H, i)) * math.pow(t, i) * (-1j) ** i
 
     phit = hamilt @ phi0
     prob =  abs(fn.dot(None, phit, mas))**2
@@ -67,7 +67,7 @@ def prob2(order,H,phi0,t):
     global menos
     hamilt = np.zeros((2, 2))
     for i in range(order):
-        hamilt = hamilt + (1 / math.factorial(i)) * (np.linalg.matrix_power(H, i)) * math.pow(t, i) * (1j) ** i
+        hamilt = hamilt + (1 / math.factorial(i)) * (np.linalg.matrix_power(H, i)) * math.pow(t, i) * (-1j) ** i
 
     phit = hamilt @ phi0
     prob =  abs(fn.dot(None, phit, menos))**2
@@ -83,10 +83,15 @@ ax1.plot(t,prob2_arr)
 ax1.grid()
 
 
+
+
+
 #Ahora vamos a comparar el resultado con el exacto, teniendo en cuenta que el operador propagador temporal usa todos los
 #infinitos terminos de la serie
 
-phit = 1/math.sqrt(2) * (  u1@np.exp([1j*E1*t]) + u2@np.exp([1j*E2*t]))
+t = np.linspace(20,60,600)
+
+phit = 1/math.sqrt(2) * (  u1@np.exp([-1j*E1*t]) + u2@np.exp([-1j*E2*t]))
 
 C1sq = []
 

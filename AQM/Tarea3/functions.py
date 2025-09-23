@@ -141,11 +141,5 @@ def sin(theta):
 
 #////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-def halm_t(order,H,t):
-    c = np.zeros((2, 2))
-    for i in range(order):
-        c = c + (1/math.factorial(i))*(np.linalg.matrix_power(H,i))*math.pow(t,i)*(1j)**i
-    return c
-
 
 

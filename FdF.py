@@ -101,9 +101,7 @@ zrot,xrot,yrot = zrot / np.linalg.norm(zrot),xrot/ np.linalg.norm(xrot),yrot/ np
 
 mrot = np.column_stack((zrot,xrot,yrot)).T
 
-# con esta matriz de transformación transformamos los ejes principales en terminos de nuestros ejes normales
-
-
+# Para hallar los indices de refracción solo basta con
 
 
 

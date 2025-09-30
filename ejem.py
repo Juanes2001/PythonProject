@@ -1,53 +1,47 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 
-# Physical constants
-λ = 633e-9  # wavelength (m)
-k = 2 * np.pi / λ
-ω = 2 * np.pi * 3e8 / λ
+wavelength = 633e-9          # 633 nm
+k = 2 * np.pi / wavelength   # wave number
+kdir = k*np.array([[1,0,0]]).T
+omega = 3e8 * k              # angular frequency
+E0 = 1.0                     # amplitude
+H0 = 0.3
 
-# z positions for arrows
-z = np.linspace(0, 5 * λ, 20)
-x = np.zeros_like(z)
-y = np.zeros_like(z)
+no = 1.6557
+ne = 1.4849
 
-# Define multiple waves
-waves = [
-    {"amplitude": 1.0, "phase": 0, "color": "r"},  # red wave
-    {"amplitude": 0.5, "phase": np.pi / 2, "color": "b"}  # blue wave
-]
 
-# Setup figure
+# Parameters of ellipsoid
+a, b, c = ne, ne, no
+
+# Create meshgrid
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+u, v = np.meshgrid(u, v)
+
+# Parametric equations
+xel = a * np.cos(u) * np.sin(v)
+yel = b * np.sin(u) * np.sin(v)
+zel = c * np.cos(v)
+
+xef = no * np.cos(u) * np.sin(v)
+yef = no * np.sin(u) * np.sin(v)
+zef = no * np.cos(v)
+
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.set_xlim(-1.5, 1.5)
-ax.set_ylim(-1.5, 1.5)
-ax.set_zlim(0, 5 * λ)
-ax.set_xlabel("X (polarization)")
-ax.set_ylabel("Y")
-ax.set_zlabel("Z (propagation)")
+ax.plot_surface(zel, xel, yel, color="red", alpha=0.6)
+ax.plot_surface(zef, xef, yef, color="blue", alpha=0.6)
 
-# Create a quiver for each wave
-quiv_objs = []
-for w in waves:
-    q = ax.quiver(x, y, z, np.zeros_like(z), np.zeros_like(z), np.zeros_like(z),
-                  color=w["color"], length=0.5, normalize=True)
-    quiv_objs.append(q)
+ax.set_xlabel("Z")
+ax.set_ylabel("X")
+ax.set_zlabel("Y")
 
+ax.set_xlim(-3, 3)
+ax.set_ylim(-3, 3)
+ax.set_zlim(-3, 3)
 
-def update(frame):
-    t = frame * 1e-16  # time step
-
-    for q, w in zip(quiv_objs, waves):
-        Ex = w["amplitude"] * np.cos(k * z - ω * t + w["phase"])
-        # update arrows (E field points in x)
-        q.remove()  # remove old arrows
-        q = ax.quiver(x, y, z, Ex, np.zeros_like(z), np.zeros_like(z),
-                      color=w["color"], length=0.5, normalize=True)
-        quiv_objs[waves.index(w)] = q
-
-
-ani = FuncAnimation(fig, update, frames=200, interval=50, blit=False)
 plt.show()

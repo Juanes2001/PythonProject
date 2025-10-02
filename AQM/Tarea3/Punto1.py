@@ -5,63 +5,59 @@
 import math
 
 import numpy as np
+import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from scipy import integrate
+from sympy.codegen.ast import integer
 
-# Definimos las condiciones iniciales de tiempo y espacio
+# definimos los parametros a usar
+x0 = 0
+t0 = 0
+p0 = 30
+num = 30
 
-x = np.linspace(-3,10,600)
-xp = np.zeros_like(x)
-tp = np.zeros_like(x)
-m = 2
-time_scale = 1e-3
+# Ahora definimos un paquete de ondas en forma de rectangulo la cual vamos a propagar libremente
 
+x,xnot, t, tnot = sp.symbols('x xnot t tnot')
+n,k = sp.symbols('n k',integer = True, positive = True)
 
-# definimos la funcion de propagacion temporal pra una particula libre.
+phi_0 = sp.Piecewise(
+    (sp.exp(1j*p0*(x-xnot)), ((x-xnot) >= -0.5) & ((x-xnot) <= 0.5)),
+          (0, True)
+)
+phi_0num = sp.lambdify((x,xnot), phi_0, 'numpy')
 
-def U(x,t,xp,tp):
+U = sp.sqrt(1/(2*math.pi*1j*(t-tnot)))*(sp.summation(  (1j*(x-xnot)**2/(2*(t-tnot)))**k/sp.factorial(k), (k, 0, n)))
 
-     prop = np.sqrt( m/(2*math.pi*1j*(t)))*np.exp(1j*m*(x-xp)**2/(2*(t-tp)))
-
-     return prop
-
-# Definimos la envolvente de la funcion de onda initial en t= 0,
-
-def phi_0(x,xp,p):
-    # return np.where((-0.5 <=(x -xp)) & ((x-xp) <= 0.5), np.exp(1j*p*x), 0)
-    return np.exp(-(x-xp)**2+1j*p*x)
-
-def phit(x,xp,t,tp):
-    phi_t = []
-    for i in x:
-        phi_t.append(integrate.simpson(phi_0(xp,0, 100)*U(i, t, xp, tp),xp))
-    return np.array(phi_t)
-
-# Update function
-def update(frame):
-    t = 2+ (frame+1) * time_scale
-    if  int(t/time_scale) <= 1:
-        ax.plot(x,np.abs(phi_0(x,0,10)))
-    else:
-        phi_t = phit(x,x,t,2)
-        ax.cla()  # clear axes
-        ax.plot(x, np.abs(phi_t / np.max(np.abs(phi_t))))
-
-    # Re-apply limits and labels (since cla() resets them)
-    ax.set_xlim(-3, 10)
-    ax.set_ylim(-1, 3)
-    ax.set_xlabel("x")
-    ax.set_ylabel("|ψ(x,t)|")
-    return []
-
-fig = plt.figure(figsize=(8,6))
-ax = fig.add_subplot()
+U_num =  sp.lambdify((x,xnot,t,tnot,n), U, 'scipy')
 
 
-# phi_t = phit(x,x,0.1,0)
-# ax.plot(x,np.abs(phi_t/np.max(np.abs(phi_t))))
+phi_t = sp.integrate(phi_0num(x,xnot)*U_num(x,xnot,t,t0,n),(xnot,-10,10))
+phi_tnum = sp.lambdify((x,t,n), phi_t, 'numpy')
 
-ani = animation.FuncAnimation(fig, update, frames=1000, interval=20, blit=False)
+x_vals = np.linspace(-10, 10, 400)
 
+
+fig, ax = plt.subplots()
+line, = ax.plot([], [], lw=2)
+ax.set_xlim(-2, 10)
+ax.set_ylim(-1, 3)
+
+
+def init():
+    line.set_data([], [])
+    return line,
+
+
+def animate(i):
+    t_val = i * 0.1
+    y_vals = phi_tnum(x_vals, t_val,num)
+    line.set_data(x_vals, y_vals)
+    return line,
+
+# 7. Create animation
+ani = animation.FuncAnimation(
+    fig, animate, init_func=init, frames=200, interval=50, blit=True
+)
+plt.grid()
 plt.show()

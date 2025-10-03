@@ -95,7 +95,7 @@ def norm(dom,fun_ort):
 
 #definimos la funcion producto punto:
 def dot(dom,fun1,fun2):
-    if dom != None:
+    if dom.any() != None:
         inte = integrate.simpson(fun1*fun2,dom)
         return inte
     else:

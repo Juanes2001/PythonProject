@@ -18,9 +18,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import functions as fn
 L = 20
-Nf = 200
+Nf = 300
 x0 = 10
 t0 = 0
+p0 = 1
 
 hbar = 1
 me = 1
@@ -41,7 +42,7 @@ xvals = np.linspace(0,20,Nf)
 
 
 def rect(x):
-    return np.where(np.abs(x-x0) <= 1/2, 1, 0)
+    return np.where(np.abs(x-x0) <= 1/2, np.exp(1j*p0*x), 0)
 
 an = []
 dn = []
@@ -62,9 +63,9 @@ fig1,ax1 = plt.subplots()
 ax1.set_xlim(0,20)
 ax1.set_ylim(-1,2)
 
-ax1.plot(xvals,rect(xvals)+2)
-ax1.plot(xvals,phi_0_RealConsts+1)
-ax1.plot(xvals,phi_0_NonRealConsts)
+ax1.plot(xvals,np.abs(rect(xvals))+2)
+ax1.plot(xvals,np.abs(phi_0_RealConsts)+1)
+ax1.plot(xvals,np.abs(phi_0_NonRealConsts))
 
 plt.grid()
 
@@ -93,18 +94,22 @@ En, bn = np.linalg.eig(H)
 cn = []
 
 for l in range(Nf):
+    bn[:, l:l + 1] = bn[:, l:l + 1] / math.sqrt(sum((bn[:, l:l + 1].T)[0] ** 2))
     cn.append(sum((bn[:,l:l+1].T)[0]*an))
+
 
 # Formamos los autoestados en forma de función
 
+cn = np.array(cn)
+cn = cn/np.linalg.norm(cn)
 
 phin = np.zeros((Nf,Nf))
 for l in range(Nf):
-    phin[l:l+1,:] = np.array((bn[l:l+1,:].T)[0]*fnum(xvals,l+1))
+    phin[l:l+1,:] = np.array((bn[l:l+1,:])[0]*fnum(xvals,l+1)/fn.dot(xvals,fnum(xvals,l+1),fnum(xvals,l+1)))
 
 # Con esto ya podemos desarrollar la propagacion temporal:
 
-tt = np.linspace(0,10,Nf)
+tt = np.linspace(0,3,Nf)
 
 def psi(tt):
     Psi = np.zeros(Nf)
@@ -113,7 +118,8 @@ def psi(tt):
     return Psi
 
 fig2,ax2 = plt.subplots()
-
+ax2.set_xlim(0, 20)
+ax2.set_ylim(-1, 4)
 line_module, = ax2.plot([], [], lw=2, color = 'blue')
 frame_text = ax2.text(0.02, 0.9, '', transform=ax2.transAxes, fontsize=12, color='red')
 
@@ -131,6 +137,9 @@ def animate(frames):
 
 ani = animation.FuncAnimation(fig2, animate,init_func=init, frames=Nf, interval=50, blit=True)
 
+
+ax2.plot(xvals,phin[:,0:1])
+print(phin)
 
 plt.grid()
 plt.show()

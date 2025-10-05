@@ -11,6 +11,4 @@ from sympy.codegen.ast import integer
 z=np.ones((3,3))
 print(z)
 
-z[:,0:1] = np.array([[1,2,3]]).T*np.array([[1,2,3]]).T
-print(z)
-print((z[:,0:1]))
+print((z[:,0:1].T)[0])

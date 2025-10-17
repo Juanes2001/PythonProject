@@ -1,16 +1,32 @@
 import numpy as np
-import sympy as sp
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from PIL.ImageColor import colormap
-from matplotlib import colors, colors
-from matplotlib.pyplot import colormaps
-from sympy.codegen.ast import integer
 
+# --- List your text files here ---
+files = [
+    "C:/Users/jero0/Desktop/LabView_Osita/Linterna_muestra1.txt",
+    "C:/Users/jero0/Desktop/LabView_Osita/Linterna_muestra2.txt",
+    "C:/Users/jero0/Desktop/LabView_Osita/Halogena_Muestra1.txt",
+    "C:/Users/jero0/Desktop/LabView_Osita/Halogena_Muestra2.txt"
+]
 
-z=np.ones((3,3))
-print(z)
+# --- Loop through files and plot each one ---
+for i, file in enumerate(files, start=1):
+    # Load the data (assuming comma-separated values, 2 columns)
+    data = np.loadtxt(file, delimiter=',')
+    x = data[:, 0]
+    y = data[:, 1]
 
-z[:,0:1] = np.array([[1,2,3]]).T*np.array([[1,2,3]]).T
-print(z)
-print((z[:,0:1]))
+    # Plot
+    plt.figure(i)
+    plt.plot(x, y, lw=1.5)
+    plt.title(f"Spectrum {i}")
+    plt.ylim(0,2)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid(True)
+    plt.tight_layout()
+
+# Show all figures
+
+plt.show()
+

@@ -103,9 +103,6 @@ mrot = np.column_stack((zrot,xrot,yrot)).T
 
 # Para hallar los indices de refracción solo basta con
 
-
-
-
 P1 = np.array([400, -3,-3 ])   # start
 P2 = np.array([200, 3, 3])   # end
 

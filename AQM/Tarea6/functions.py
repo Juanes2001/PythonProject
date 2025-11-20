@@ -73,7 +73,7 @@ def Gram(dom, fun):
 def norm(dom,fun_ort):
 
     #contamos cual es la dimension de la base
-    if dom != None:
+    if sum(dom) != 0:
         len_base = len(fun_ort)
         norm_sqr = []
         for i in range(len_base):
@@ -87,7 +87,7 @@ def norm(dom,fun_ort):
         len_base = len(fun_ort)
         norm_sqr = []
         for i in range(len_base):
-            norm_sqr.append(math.sqrt(dot(None, fun_ort[i], fun_ort[i])))
+            norm_sqr.append(math.sqrt(dot([], fun_ort[i], fun_ort[i])))
 
         fun_ort_norm = np.array([fun_ort[i] / norm_sqr[i] for i in range(len_base)])
         return fun_ort_norm

@@ -12,13 +12,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import math
 
 
-lam = np.linspace(500e-9,800e-9,5000)
+lam = np.linspace(500e-9,1100e-9,5000)
 nh = 1
-eav = 1.2**2
-del_av = 0.001*math.sqrt(eav)/2
+eav = 1.462**2
+del_av = 0.06*math.sqrt(eav)/2
 p = 525e-9
 alfa = lam/p
-h = 10e-6
+h = 300e-6
 
 
 Ax = sp.Integer(1)
@@ -39,7 +39,9 @@ print(data)
 
 ax1.plot(lam,data)
 ax1.set_ylim(0,1.3)
+plt.grid()
 plt.show()
+
 
 
 # print(fun.find_amplitudes_LinPol(n1,n2,nh,math.pi,h,"oelo"))

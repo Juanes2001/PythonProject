@@ -82,15 +82,14 @@ def Aprime_0(n):
 # Eigenmodos
 
 def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
-    u, r, v1, v2, t, w, ncnc1, ncnc2, lam = sp.symbols('u r v1 v2 t w ncnc1 ncnc2 lam')
+
+    t, ncnc1, lam = sp.symbols('t ncnc1 lam', complex = True)
+    u, r, v1, v2, w, ncnc2 = sp.symbols('u r v1 v2 w ncnc2', complex = True)
 
     n_cnc1 = sp.sqrt(
         (lam / pitch) ** 2 + eav + sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2 + sp.I * 0) + sp.I * 0)
-    n_cnc2 = sp.sqrt(
-        (lam / pitch) ** 2 + eav - sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2 + sp.I * 0) + sp.I * 0)
 
-    rp = sp.Integer(0)
-    up = sp.Integer(0)
+    n_cnc2_2 = (lam / pitch) ** 2 + eav - sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2)
 
     f1 = sp.Eq(u + r, v1 + v2)
     f2 = sp.Eq(u - r, -sp.I * w * v1 + sp.I * w * v2)
@@ -99,14 +98,14 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
 
     if pol == "LCP":
 
-        W = 1j * ((epsilon_ab + delta_ab) - n_cnc2 ** 2 - (lam / pitch) ** 2) / (2 * (lam / pitch) * n_cnc2)
+        W = sp.I * ((epsilon_ab + delta_ab) - ncnc2 ** 2 - (lam / pitch) ** 2) / (2 * (lam / pitch) * ncnc2)
 
         f3 = sp.Eq(v1 * sp.exp(-sp.I * (2 * sp.pi / lam) * ncnc2 * width) + v2 * sp.exp(
-            sp.I * (2 * sp.pi / lam) * ncnc2 * width)
+                    sp.I * (2 * sp.pi / lam) * ncnc2 * width)
                    , t * sp.exp(-sp.I * (2 * sp.pi / lam) * n_medium * width))
 
         f4 = sp.Eq(v1 * w * sp.exp(-sp.I * (2 * sp.pi / lam) * ncnc2 * width) - v2 * w * sp.exp(
-            sp.I * (2 * sp.pi / lam) * ncnc2 * width)
+                    sp.I * (2 * sp.pi / lam) * ncnc2 * width)
                    , sp.I * t * sp.exp(-sp.I * (2 * sp.pi / lam) * n_medium * width))
 
         sol2 = sp.solve((f3, f4), (v1, v2))
@@ -114,35 +113,49 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
         sol2[v1] = sp.simplify(sol2[v1])
         sol2[v2] = sp.simplify(sol2[v2])
 
-        rp = sp.simplify(sol1[r].subs({v1: sol2[v1], v2: sol2[v2], w: W, ncnc2: n_cnc2}))
-        up = sp.simplify(sol1[u].subs({v1: sol2[v1], v2: sol2[v2], w: W, ncnc2: n_cnc2}))
+        R = (sol1[r] / sol1[u])
+
+        R = sp.simplify(R.subs({v1: sol2[v1], v2: sol2[v2]}))
+
+        ncnc_num = sp.lambdify(lam, n_cnc2_2, "numpy"); ncnc_arr = np.sqrt(ncnc_num(spectrum) + 1j*0)
+        w_num = sp.lambdify((lam,ncnc2), W, "numpy"); w_arr = w_num(spectrum, ncnc_arr)
+
+        R = sp.lambdify((lam, w, ncnc2), R, "numpy")
+
+        Reflection = R(spectrum, w_arr, ncnc_arr)
 
     elif pol == "RCP":
 
         W = sp.I * ((epsilon_ab + delta_ab) - n_cnc1 ** 2 - (lam / pitch) ** 2) / (2 * (lam / pitch) * n_cnc1)
 
-        f3 = sp.Eq(v1 * sp.exp(-sp.I * (2 * sp.pi / lam) * ncnc1 * width) + v2 * sp.exp(
-            sp.I * (2 * sp.pi / lam) * ncnc1 * width)
-                   , t * sp.exp(-sp.I * (2 * sp.pi / lam) * n_medium * width))
+        f3 = sp.Eq(v1 * sp.exp(sp.simplify(-sp.I * (2 * sp.pi / lam) * ncnc1 * width)) + v2 * sp.exp(
+            sp.simplify(sp.I * (2 * sp.pi / lam) * ncnc1 * width))
+                   , t * sp.exp(sp.simplify(-sp.I * (2 * sp.pi / lam) * n_medium * width)))
 
-        f4 = sp.Eq(v1 * w * sp.exp(-sp.I * (2 * sp.pi / lam) * ncnc1 * width) - v2 * w * sp.exp(
-            sp.I * (2 * sp.pi / lam) * ncnc1 * width)
-                   , sp.I * t * sp.exp(-sp.I * (2 * sp.pi / lam) * n_medium * width))
+        f4 = sp.Eq(v1 * w * sp.exp(sp.simplify(-sp.I * (2 * sp.pi / lam) * ncnc1 * width)) - v2 * w * sp.exp(
+            sp.simplify(sp.I * (2 * sp.pi / lam) * ncnc1 * width))
+                   , sp.I * t * sp.exp(sp.simplify(-sp.I * (2 * sp.pi / lam) * n_medium * width)))
 
         sol2 = sp.solve((f3, f4), (v1, v2))
 
         sol2[v1] = sp.simplify(sol2[v1])
         sol2[v2] = sp.simplify(sol2[v2])
 
-        R = (sp.conjugate(sol1[r] / sol1[u]) * (sol1[r] / sol1[u])) ** 2
+        R = (sol1[r] / sol1[u])
 
-        R = R.subs({v1: sol2[v1], v2: sol2[v2], w: W, ncnc1: n_cnc1})
+        R = sp.simplify(R.subs({v1: sol2[v1], v2: sol2[v2]}))
 
-    R = sp.lambdify((lam), R, "numpy")
 
-    Reflection = R(spectrum)
+        w_num = sp.lambdify((lam),W, "numpy"); w_arr = w_num (spectrum)
+        ncnc_num = sp.lambdify((lam),n_cnc1, "numpy"); ncnc_arr = ncnc_num(spectrum)
 
-    return Reflection
+        R = sp.lambdify((lam,w,ncnc1), R, "numpy")
+
+        Reflection = R(spectrum,w_arr,ncnc_arr)
+
+    R1 = (np.conjugate(Reflection) * Reflection)**2
+
+    return R1
 
 
 # Definimos una funcion que halle las amplitudes de etrada con respecto a las aplitudes

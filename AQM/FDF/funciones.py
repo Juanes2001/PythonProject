@@ -29,7 +29,6 @@ c = 299792458
 delta_ab = 0.001
 epsilon_ab = 1.41 ** 2
 lambda0 = 500E-9
-k0 = 2 * math.pi / lambda0
 alf = lambda0 / p
 
 nx = math.sqrt(epsilon_ab + delta_ab)
@@ -173,51 +172,75 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
 def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av):
 
     t1, ncnc1, lam = sp.symbols('t ncnc1 lam')
-    u, r, v1, v2, v3, v4, w, ncnc2 = sp.symbols('u r v1 v2 w ncnc2')
+    u, r, v1, v2, v3, v4, w1, w2, ncnc2 = sp.symbols('u r v1 v2 v3 v4 w1 w2 ncnc2')
+
+    A,Ap,B,Bp,C = sp.symbols('A Ap B Bp C')
+
+    k0 = 2 * sp.pi / lam
+
+    A_form = sp.exp(-sp.I * k0 * ncnc2 * width)
+    B_form = sp.exp(-sp.I * k0 * ncnc1 * width)
+    C_form = sp.exp(-sp.I * k0 * n_medium * width)
 
     n_cnc1 = sp.sqrt(
         (lam / pitch) ** 2 + eav + sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2 + sp.I * 0) + sp.I * 0)
     n_cnc2_2 = (lam / pitch) ** 2 + eav - sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2)
 
-    w1 = sp.I * ((eav + del_av) - ncnc1 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc1)
-    w2 = sp.I * ((eav + del_av) - ncnc2 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc2)
+    W1 = sp.I * ((eav + del_av) - ncnc1 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc1)
+    W2 = sp.I * ((eav + del_av) - ncnc2 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc2)
 
     t2 = u / sp.sqrt(2) * sp.exp(-sp.I * theta)
 
-    f3 = sp.Eq(v1 * sp.exp(-sp.I * k0 * ncnc2 * width) + v2 * sp.exp(sp.I * k0 * ncnc2 * width) +
-               v3 * sp.exp(-sp.I * k0 * ncnc1 * width) + v4 * sp.exp(sp.I * k0 * ncnc1 * width)
-               , (t1 + t2) * sp.exp(-sp.I * k0 * n_medium * width))
+    f3 = sp.Eq(v1 * A + v2 * Ap +
+               v3 * B + v4 * Bp
+               , (t1 + t2) * C)
 
-    f4 = sp.Eq(-w2 * v1 * sp.exp(-sp.I * k0 * ncnc2 * width) + w2 * v2 * sp.exp(sp.I * k0 * ncnc2 * width) +
-               w1 * v3 * sp.exp(-sp.I * k0 * ncnc1 * width) - w1 * v4 * sp.exp(sp.I * k0 * ncnc1 * width)
-               , (-t1 + t2) * sp.I * sp.exp(-sp.I * k0 * n_medium * width))
+    f4 = sp.Eq(-w2 * v1 * A + w2 * v2 * Ap +
+                w1 * v3 * B - w1 * v4 * Bp
+                , (-t1 + t2) * sp.I * C)
 
-    f5 = sp.Eq(-ncnc2 * v1 * sp.exp(-sp.I * k0 * ncnc2 * width) + ncnc2 * v2 * sp.exp(sp.I * k0 * ncnc2 * width) -
-               ncnc1 * v3 * sp.exp(-sp.I * k0 * ncnc1 * width) + ncnc1 * v4 * sp.exp(sp.I * k0 * ncnc1 * width)
-               , -(t1 + t2) * sp.I * k0 * n_medium * sp.exp(-sp.I * k0 * n_medium * width))
+    f5 = sp.Eq(-ncnc2 * v1 * A + ncnc2 * v2 * Ap -
+                ncnc1 * v3 * B + ncnc1 * v4 * Bp
+               , -(t1 + t2) * sp.I * k0 * n_medium * C)
 
     f6 = sp.Eq(
-        ncnc2 * w2 * v1 * sp.exp(-sp.I * k0 * ncnc2 * width) + ncnc2 * w2 * v2 * sp.exp(sp.I * k0 * ncnc2 * width) -
-        ncnc1 * w1 * v3 * sp.exp(-sp.I * k0 * ncnc1 * width) - ncnc1 * w1 * v4 * sp.exp(sp.I * k0 * ncnc1 * width)
-        , (-t1 + t2) * k0 * n_medium * sp.exp(-sp.I * k0 * n_medium * width))
+        ncnc2 * w2 * v1 * A + ncnc2 * w2 * v2 * Ap -
+        ncnc1 * w1 * v3 * B - ncnc1 * w1 * v4 * Bp
+        , (-t1 + t2) * k0 * n_medium * C)
 
     sol2 = sp.solve((f3, f4, f5, f6), (v1, v2, v3, v4))
 
+    sol2[v1] = sp.simplify(sol2[v1])
+    sol2[v2] = sp.simplify(sol2[v2])
+    sol2[v3] = sp.simplify(sol2[v3])
+    sol2[v4] = sp.simplify(sol2[v4])
+
     f1 = sp.Eq(u * sp.cos(theta) + r * sp.cos(theta),
-               1 / math.sqrt(2) * (sol2[v1] + sol2[v2] + sol2[v3] + sol2[v4]))
+               1 / math.sqrt(2) * (sol2[v1] + sol2[v2]+ sol2[v3] + sol2[v4]))
     f2 = sp.Eq(u * sp.sin(theta) - r * sp.sin(theta),
-               1 / math.sqrt(2) * (-w2 * sol2[v1] + w2 * sol2[v2] + w1 * sol2[v3] - w1 * sol2[v4])) # Pendiente para probar
-                                                                                                    #hasta aca
+               1 / math.sqrt(2) * (-w2 * sol2[v1] + w2 * sol2[v2] + w1 * sol2[v3] - w1 * sol2[v4]))
 
-    sol1 = sp.solve((f1, f2), (u, r))
+    sol1 = sp.solve((f1, f2), (r, u))
 
-    R = sp.simplify((sp.conjugate(sol1[r] / sol1[u]) * (sol1[r] / sol1[u])) ** 2)
+    sol1[u] = sp.simplify(sol1[u])
+    sol1[r] = sp.simplify(sol1[r])
 
-    R = sp.lambdify((lam), R, "numpy")
+    R = sp.simplify(sol1[r] / sol1[u])
 
-    Reflection = R(spectrum)
+    R = sp.simplify(R.subs({v1: sol2[v1], v2: sol2[v2], v3: sol2[v3], v4: sol2[v4]}))
 
-    return Reflection
+    w1_num = sp.lambdify((lam), W1, "numpy");w1_arr = w1_num(spectrum)
+    w2_num = sp.lambdify((lam), W2, "numpy");w2_arr = w2_num(spectrum)
+    ncnc1_num = sp.lambdify((lam), n_cnc1, "numpy");ncnc1_arr = ncnc1_num(spectrum)
+    ncnc2_num = sp.lambdify((lam), n_cnc2_2, "numpy");ncnc2_arr = np.sqrt(ncnc2_num(spectrum)+ 1j*0)
+
+    R = sp.lambdify((lam,w1,w2,ncnc1,ncnc2), R, "numpy")
+
+    Reflection = R(spectrum, w1_arr, w2_arr, ncnc1_arr, ncnc2_arr)
+
+    R1 = (np.abs(Reflection)) ** 2
+
+    return R1
 
 
 # Definición en forma simbólica del operador rotacion S(theta)

@@ -32,7 +32,7 @@ Ay = -sp.I
 
 fig, ax1 = plt.subplots()
 
-data = 1 - fun.find_amplitudes_LCP_RCP(lam,nh,h,p,eav,del_av,"LCP")
+data = 1 - fun.find_amplitudes_LinPol(lam,nh,sp.pi/4,h,p,eav,del_av)
 
 
 print(data)

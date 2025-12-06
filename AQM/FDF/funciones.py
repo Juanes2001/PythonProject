@@ -171,7 +171,7 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
 
 def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av):
 
-    t1, ncnc1, lam = sp.symbols('t ncnc1 lam')
+    t1, ncnc1, lam = sp.symbols('t1 ncnc1 lam')
     u, r, v1, v2, v3, v4, w1, w2, ncnc2 = sp.symbols('u r v1 v2 v3 v4 w1 w2 ncnc2')
 
     A,Ap,B,Bp,C = sp.symbols('A Ap B Bp C')
@@ -179,7 +179,9 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
     k0 = 2 * sp.pi / lam
 
     A_form = sp.exp(-sp.I * k0 * ncnc2 * width)
+    Ap_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc2 * width))
     B_form = sp.exp(-sp.I * k0 * ncnc1 * width)
+    Bp_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc1 * width))
     C_form = sp.exp(-sp.I * k0 * n_medium * width)
 
     n_cnc1 = sp.sqrt(

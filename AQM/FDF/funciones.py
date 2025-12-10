@@ -231,18 +231,17 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
     H = sp.sec(theta) - w1 * sp.csc(theta); H = H.subs({w1: W1.subs({ncnc1: n_cnc1})})
     Hp = sp.sec(theta) + w1 * sp.csc(theta); Hp = Hp.subs({w1: W1.subs({ncnc1: n_cnc1})})
 
+    sq2 = math.sqrt(2)
 
-    # R =
+    t_u = (2*sq2 - b1*G/sq2 - b2*Gp/sq2 - b3*Hp/sq2 - b4*H/sq2)/(G*a1 + Gp*a2 + Hp*a3 + H*a4)
 
+    R = (Gp*(t_u*a1+b1/sq2) + G*(t_u*a2+b2/sq2) + H*(t_u*a3+b3/sq2) + Hp*(t_u*a4+b4/sq2))/(2*sq2)
 
-    w1_num = sp.lambdify((lam), W1, "numpy");w1_arr = w1_num(spectrum)
-    w2_num = sp.lambdify((lam), W2, "numpy");w2_arr = w2_num(spectrum)
-    ncnc1_num = sp.lambdify((lam), n_cnc1, "numpy");ncnc1_arr = ncnc1_num(spectrum)
     ncnc2_num = sp.lambdify((lam), n_cnc2_2, "numpy");ncnc2_arr = np.sqrt(ncnc2_num(spectrum) + 1j*0)
 
-    R = sp.lambdify((lam,w1,w2,ncnc1,ncnc2), R, "numpy")
+    R = sp.lambdify((lam,ncnc2), R, "numpy")
 
-    Reflection = R(spectrum, w1_arr, w2_arr, ncnc1_arr, ncnc2_arr)
+    Reflection = R(spectrum, ncnc2_arr)
 
     R1 = (np.abs(Reflection)) ** 2
 

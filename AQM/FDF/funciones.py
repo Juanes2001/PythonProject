@@ -172,9 +172,11 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
 def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av):
 
     t1, ncnc1, lam = sp.symbols('t1 ncnc1 lam')
-    u, r, v1, v2, v3, v4, w1, w2, ncnc2 = sp.symbols('u r v1 v2 v3 v4 w1 w2 ncnc2')
+    u, r, v1_alfa, v2_alfa, v3_alfa, v4_alfa, w1, w2, ncnc2 = sp.symbols('u r v1_alfa v2_alfa v3_alfa v4_alfa w1 w2 ncnc2')
 
-    A,Ap,B,Bp,C = sp.symbols('A Ap B Bp C')
+    v1_beta, v2_beta, v3_beta, v4_beta = sp.symbols('v1_beta v2_beta v3_beta v4_beta')
+
+    A,Ap,B,Bp,C,Cp,K0 = sp.symbols('A Ap B Bp C Cp K0')
 
     k0 = 2 * sp.pi / lam
 
@@ -182,7 +184,9 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
     Ap_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc2 * width))
     B_form = sp.exp(-sp.I * k0 * ncnc1 * width)
     Bp_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc1 * width))
-    C_form = sp.exp(-sp.I * k0 * n_medium * width)
+    C1_form = sp.exp(-sp.I * k0 * n_medium * width)
+    C2_form = sp.exp(-sp.I*(k0*n_medium*width + theta))
+
 
     n_cnc1 = sp.sqrt(
         (lam / pitch) ** 2 + eav + sp.sqrt(del_av ** 2 + 4 * eav * (lam / pitch) ** 2 + sp.I * 0) + sp.I * 0)
@@ -193,29 +197,41 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
 
     t2 = u / sp.sqrt(2) * sp.exp(-sp.I * theta)
 
-    f3 = sp.Eq(v1 * A + v2 * Ap +
-               v3 * B + v4 * Bp
-               , (t1 + t2) * C)
+    f1_alfa = sp.Eq(sp.simplify(v1_alfa * A + v2_alfa * Ap + v3_alfa * B + v4_alfa * Bp),                                                          t1 * C)
+    f2_alfa = sp.Eq(sp.simplify(-w2 * v1_alfa * A + w2 * v2_alfa * Ap +w1 * v3_alfa * B - w1 * v4_alfa * Bp),                                     -t1 * C* sp.I )
+    f3_alfa = sp.Eq(sp.simplify(-ncnc2 * v1_alfa * A + ncnc2 * v2_alfa * Ap -ncnc1 * v3_alfa * B + ncnc1 * v4_alfa * Bp),                         -t1 * sp.I * K0 * n_medium * C)
+    f4_alfa = sp.Eq(sp.simplify(ncnc2 * w2 * v1_alfa * A + ncnc2 * w2 * v2_alfa * Ap -ncnc1 * w1 * v3_alfa * B - ncnc1 * w1 * v4_alfa * Bp),      -t1 * K0 * n_medium * C)
 
-    f4 = sp.Eq(-w2 * v1 * A + w2 * v2 * Ap +
-                w1 * v3 * B - w1 * v4 * Bp
-                , (-t1 + t2) * sp.I * C)
+    V_alfa = sp.solve((f1_alfa, f2_alfa, f3_alfa, f4_alfa), (v1_alfa, v2_alfa, v3_alfa, v4_alfa))
 
-    f5 = sp.Eq(-ncnc2 * v1 * A + ncnc2 * v2 * Ap -
-                ncnc1 * v3 * B + ncnc1 * v4 * Bp
-               , -(t1 + t2) * sp.I * k0 * n_medium * C)
 
-    f6 = sp.Eq(
-        ncnc2 * w2 * v1 * A + ncnc2 * w2 * v2 * Ap -
-        ncnc1 * w1 * v3 * B - ncnc1 * w1 * v4 * Bp
-        , (-t1 + t2) * k0 * n_medium * C)
+    V_alfa[v1_alfa] = sp.simplify(V_alfa[v1_alfa])
+    V_alfa[v2_alfa] = sp.simplify(V_alfa[v2_alfa])
+    V_alfa[v3_alfa] = sp.simplify(V_alfa[v3_alfa])
+    V_alfa[v4_alfa] = sp.simplify(V_alfa[v4_alfa])
 
-    sol2 = sp.solve((f3, f4, f5, f6), (v1, v2, v3, v4))
+    f1_beta= sp.Eq(
+                sp.simplify(v1_beta * A_form + v2_beta * Ap_form + v3_beta * B_form + v4_beta * Bp_form),
+                    u/math.sqrt(2) * C2_form)
+    f2_beta = sp.Eq(
+                sp.simplify(-w2 * v1_beta * A_form + w2 * v2_beta * Ap_form + w1 * v3_beta * B_form - w1 * v4_beta * Bp_form),
+                    u/math.sqrt(2) * C2_form * sp.I)
+    f3_beta = sp.Eq(
+                sp.simplify(-ncnc2 * v1_beta * A_form + ncnc2 * v2_beta * Ap_form - ncnc1 * v3_beta * B_form + ncnc1 * v4_beta * Bp_form),
+                   -u/math.sqrt(2) * sp.I * k0 * n_medium * C2_form)
+    f4_beta = sp.Eq(
+                sp.simplify(ncnc2 * w2 * v1_beta * A_form + ncnc2 * w2 * v2_beta * Ap_form - ncnc1 * w1 * v3_beta * B_form - ncnc1 * w1 * v4_beta * Bp_form),
+                    u/math.sqrt(2) * k0 * n_medium * C2_form)
 
-    sol2[v1] = sp.simplify(sol2[v1])
-    sol2[v2] = sp.simplify(sol2[v2])
-    sol2[v3] = sp.simplify(sol2[v3])
-    sol2[v4] = sp.simplify(sol2[v4])
+    V_beta = sp.solve((f1_beta, f2_beta, f3_beta, f4_beta), (v1_beta, v2_beta, v3_beta, v4_beta))
+
+    V_beta[v1_beta] = sp.simplify(V_beta[v1_beta])
+    V_beta[v2_beta] = sp.simplify(V_beta[v2_beta])
+    V_beta[v3_beta] = sp.simplify(V_beta[v3_beta])
+    V_beta[v4_beta] = sp.simplify(V_beta[v4_beta])
+
+
+
 
     f1 = sp.Eq(u * sp.cos(theta) + r * sp.cos(theta),
                1 / math.sqrt(2) * (sol2[v1] + sol2[v2]+ sol2[v3] + sol2[v4]))

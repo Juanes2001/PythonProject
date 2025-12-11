@@ -171,21 +171,27 @@ def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch, eav, del_av, pol):
 
 def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av):
 
-    t1, ncnc1, lam = sp.symbols('t1 ncnc1 lam')
-    u, r, v1_alfa, v2_alfa, v3_alfa, v4_alfa, w1, w2, ncnc2 = sp.symbols('u r v1_alfa v2_alfa v3_alfa v4_alfa w1 w2 ncnc2')
+    t1,t2, ncnc1, lam = sp.symbols('t1 t2 ncnc1 lam')
+    u, r, w1, w2, ncnc2 = sp.symbols('u r w1 w2 ncnc2')
 
+    v1_alfa, v2_alfa, v3_alfa, v4_alfa = sp.symbols('v1_alfa v2_alfa v3_alfa v4_alfa')
     v1_beta, v2_beta, v3_beta, v4_beta = sp.symbols('v1_beta v2_beta v3_beta v4_beta')
+    v1_gamma, v2_gamma, v3_gamma, v4_gamma = sp.symbols('v1_gamma v2_gamma v3_gamma v4_gamma')
+    v1_del, v2_del, v3_del, v4_del = sp.symbols('v1_del v2_del v3_del v4_del')
 
-    A,Ap,B,Bp,C,Cp,K0 = sp.symbols('A Ap B Bp C Cp K0')
+    l1,l2,l3,l4,l5,l6,l7,l8,l9 = sp.symbols('l1 l2 l3 l4 l5 l6 l7 l8 l9')
+    e1,e2,e3 = sp.symbols('e1 e2 e3')
+    A,Ap,B,Bp,C,Cp = sp.symbols('A Ap B Bp C Cp')
 
     k0 = 2 * sp.pi / lam
 
     A_form = sp.exp(-sp.I * k0 * ncnc2 * width)
-    Ap_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc2 * width))
+    Ap_form = sp.exp(sp.I * k0 * ncnc2 * width)
     B_form = sp.exp(-sp.I * k0 * ncnc1 * width)
-    Bp_form = sp.conjugate(sp.exp(-sp.I * k0 * ncnc1 * width))
+    Bp_form = sp.exp(sp.I * k0 * ncnc1 * width)
     C_form = sp.exp(-sp.I * k0 * n_medium * width)
     Cp_form = sp.exp(-sp.I*(k0*n_medium*width + theta))
+
 
 
     n_cnc1 = sp.sqrt(
@@ -195,47 +201,108 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
     W1 = sp.I * ((eav + del_av) - ncnc1 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc1)
     W2 = sp.I * ((eav + del_av) - ncnc2 ** 2 - (lam/pitch) ** 2) / (2 * (lam/pitch) * ncnc2)
 
-    t2 = u / sp.sqrt(2) * sp.exp(-sp.I * theta)
 
-    f1_alfa = sp.Eq(sp.simplify(v1_alfa * A + v2_alfa * Ap + v3_alfa * B + v4_alfa * Bp),                                                          t1 * C)
-    f2_alfa = sp.Eq(sp.simplify(-w2 * v1_alfa * A + w2 * v2_alfa * Ap +w1 * v3_alfa * B - w1 * v4_alfa * Bp),                                     -t1 * C* sp.I )
-    f3_alfa = sp.Eq(sp.simplify(-ncnc2 * v1_alfa * A + ncnc2 * v2_alfa * Ap -ncnc1 * v3_alfa * B + ncnc1 * v4_alfa * Bp),                         -t1 * sp.I * K0 * n_medium * C)
-    f4_alfa = sp.Eq(sp.simplify(ncnc2 * w2 * v1_alfa * A + ncnc2 * w2 * v2_alfa * Ap -ncnc1 * w1 * v3_alfa * B - ncnc1 * w1 * v4_alfa * Bp),      -t1 * K0 * n_medium * C)
+    f1_alfa = sp.Eq(v1_alfa * A + v2_alfa * Ap + v3_alfa * B + v4_alfa * Bp,                                                          t1 * C)
+    f2_alfa = sp.Eq(-w2 * v1_alfa * A + w2 * v2_alfa * Ap +w1 * v3_alfa * B - w1 * v4_alfa * Bp,                                     -t1 * C* sp.I )
+    f3_alfa = sp.Eq(-ncnc2 * v1_alfa * A + ncnc2 * v2_alfa * Ap -ncnc1 * v3_alfa * B + ncnc1 * v4_alfa * Bp,                         -t1 * n_medium * C)
+    f4_alfa = sp.Eq(ncnc2 * w2 * v1_alfa * A + ncnc2 * w2 * v2_alfa * Ap -ncnc1 * w1 * v3_alfa * B - ncnc1 * w1 * v4_alfa * Bp,      t1 *sp.I* n_medium * C)
 
     V_alfa = sp.solve((f1_alfa, f2_alfa, f3_alfa, f4_alfa), (v1_alfa, v2_alfa, v3_alfa, v4_alfa))
 
 
-    a1 = V_alfa[v1_alfa] = sp.simplify(V_alfa[v1_alfa])/t1; a1 = a1.subs({A: A_form,C: C_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    a2 = V_alfa[v2_alfa] = sp.simplify(V_alfa[v2_alfa])/t1; a2 = a2.subs({Ap: Ap_form,C: C_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    a3 = V_alfa[v3_alfa] = sp.simplify(V_alfa[v3_alfa])/t1; a3 = a3.subs({B: B_form,C: C_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    a4 = V_alfa[v4_alfa] = sp.simplify(V_alfa[v4_alfa])/t1; a4 = a4.subs({Bp: Bp_form,C: C_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    a1 = V_alfa[v1_alfa] = sp.simplify(V_alfa[v1_alfa])/t1; a1 = a1.subs({A: A_form,C: C_form})
+    a2 = V_alfa[v2_alfa] = sp.simplify(V_alfa[v2_alfa])/t1; a2 = a2.subs({Ap: Ap_form,C: C_form})
+    a3 = V_alfa[v3_alfa] = sp.simplify(V_alfa[v3_alfa])/t1; a3 = a3.subs({B: B_form,C: C_form})
+    a4 = V_alfa[v4_alfa] = sp.simplify(V_alfa[v4_alfa])/t1; a4 = a4.subs({Bp: Bp_form,C: C_form})
 
-    f1_beta= sp.Eq(sp.simplify(v1_beta * A + v2_beta * Ap + v3_beta * B + v4_beta * Bp),
-                    u/math.sqrt(2) * Cp)
-    f2_beta = sp.Eq(sp.simplify(-w2 * v1_beta * A + w2 * v2_beta * Ap + w1 * v3_beta * B - w1 * v4_beta * Bp),
-                    u/math.sqrt(2) * Cp * sp.I)
-    f3_beta = sp.Eq(sp.simplify(-ncnc2 * v1_beta * A + ncnc2 * v2_beta * Ap - ncnc1 * v3_beta * B + ncnc1 * v4_beta * Bp),
-                   -u/math.sqrt(2) * sp.I * K0 * n_medium * Cp)
-    f4_beta = sp.Eq(sp.simplify(ncnc2 * w2 * v1_beta * A + ncnc2 * w2 * v2_beta * Ap - ncnc1 * w1 * v3_beta * B - ncnc1 * w1 * v4_beta * Bp),
-                    u/math.sqrt(2) * K0 * n_medium * Cp)
+    f1_beta= sp.Eq(v1_beta * A + v2_beta * Ap + v3_beta * B + v4_beta * Bp,
+                    t2 * C)
+    f2_beta = sp.Eq(-w2 * v1_beta * A + w2 * v2_beta * Ap + w1 * v3_beta * B - w1 * v4_beta * Bp,
+                    t2 * C * sp.I)
+    f3_beta = sp.Eq(-ncnc2 * v1_beta * A + ncnc2 * v2_beta * Ap - ncnc1 * v3_beta * B + ncnc1 * v4_beta * Bp,
+                   -t2 * n_medium * C)
+    f4_beta = sp.Eq(ncnc2 * w2 * v1_beta * A + ncnc2 * w2 * v2_beta * Ap - ncnc1 * w1 * v3_beta * B - ncnc1 * w1 * v4_beta * Bp,
+                    -t2 *sp.I* n_medium * C)
 
     V_beta = sp.solve((f1_beta, f2_beta, f3_beta, f4_beta), (v1_beta, v2_beta, v3_beta, v4_beta))
 
-    b1 = V_beta[v1_beta] = sp.simplify(V_beta[v1_beta])/u; b1 = b1.subs({A: A_form,Cp: Cp_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    b2 = V_beta[v2_beta] = sp.simplify(V_beta[v2_beta])/u; b2 = b2.subs({Ap: Ap_form,Cp: Cp_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    b3 = V_beta[v3_beta] = sp.simplify(V_beta[v3_beta])/u; b3 = b3.subs({B: B_form,Cp: Cp_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
-    b4 = V_beta[v4_beta] = sp.simplify(V_beta[v4_beta])/u; b4 = b4.subs({Bp: Bp_form,Cp: Cp_form, K0: k0, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    b1 = V_beta[v1_beta] = sp.simplify(V_beta[v1_beta])/t2; b1 = b1.subs({A: A_form,C: C_form})
+    b2 = V_beta[v2_beta] = sp.simplify(V_beta[v2_beta])/t2; b2 = b2.subs({Ap: Ap_form,C: C_form})
+    b3 = V_beta[v3_beta] = sp.simplify(V_beta[v3_beta])/t2; b3 = b3.subs({B: B_form,C: C_form})
+    b4 = V_beta[v4_beta] = sp.simplify(V_beta[v4_beta])/t2; b4 = b4.subs({Bp: Bp_form,C: C_form})
 
-    G = sp.sec(theta) - w2*sp.csc(theta); G = G.subs({w2: W2})
-    Gp = sp.sec(theta) + w2*sp.csc(theta); Gp = Gp.subs({w2: W2})
-    H = sp.sec(theta) - w1 * sp.csc(theta); H = H.subs({w1: W1.subs({ncnc1: n_cnc1})})
-    Hp = sp.sec(theta) + w1 * sp.csc(theta); Hp = Hp.subs({w1: W1.subs({ncnc1: n_cnc1})})
 
+    """
+    AHORA PARA U Y V 
+    """
+
+    f1_gamma = sp.Eq(v1_gamma  + v2_gamma  + v3_gamma  + v4_gamma , u * sp.cos(theta))
+    f2_gamma = sp.Eq(-w2 * v1_gamma + w2 * v2_gamma + w1 * v3_gamma - w1 * v4_gamma, u * sp.sin(theta))
+    f3_gamma = sp.Eq(-ncnc2 * v1_gamma + ncnc2 * v2_gamma - ncnc1 * v3_gamma + ncnc1 * v4_gamma, -u * n_medium * sp.cos(theta))
+    f4_gamma = sp.Eq(ncnc2 * w2 * v1_gamma + ncnc2 * w2 * v2_gamma - ncnc1 * w1 * v3_gamma - ncnc1 * w1 * v4_gamma, -u * n_medium * sp.sin(theta))
+
+    V_gamma = sp.solve((f1_gamma, f2_gamma, f3_gamma, f4_gamma), (v1_gamma, v2_gamma, v3_gamma, v4_gamma))
+
+    g1 = V_gamma[v1_gamma] = sp.simplify(V_gamma[v1_gamma])/u  # /t1; a1 = a1.subs({A: A_form,C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    g2 = V_gamma[v2_gamma] = sp.simplify(V_gamma[v2_gamma])/u  # /t1; a2 = a2.subs({Ap: Ap_form,C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    g3 = V_gamma[v3_gamma] = sp.simplify(V_gamma[v3_gamma])/u  # /t1; a3 = a3.subs({B: B_form.subs({ncnc1: n_cnc1}),C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    g4 = V_gamma[v4_gamma] = sp.simplify(V_gamma[v4_gamma])/u # /t1; a4 = a4.subs({Bp: Bp_form.subs({ncnc1: n_cnc1}),C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+
+    f1_del = sp.Eq(v1_del + v2_del + v3_del + v4_del, r * sp.cos(theta))
+    f2_del = sp.Eq(-w2 * v1_del + w2 * v2_del + w1 * v3_del - w1 * v4_del, -r * sp.sin(theta))
+    f3_del = sp.Eq(-ncnc2 * v1_del + ncnc2 * v2_del - ncnc1 * v3_del + ncnc1 * v4_del, -r * n_medium * sp.cos(theta))
+    f4_del = sp.Eq(ncnc2 * w2 * v1_del + ncnc2 * w2 * v2_del - ncnc1 * w1 * v3_del - ncnc1 * w1 * v4_del, r * n_medium * sp.sin(theta))
+
+    V_del = sp.solve((f1_del, f2_del, f3_del, f4_del), (v1_del, v2_del, v3_del, v4_del))
+
+    d1 = V_del[v1_del] = sp.simplify(V_del[v1_del])/r  # /t1; a1 = a1.subs({A: A_form,C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    d2 = V_del[v2_del] = sp.simplify(V_del[v2_del])/r  # /t1; a2 = a2.subs({Ap: Ap_form,C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    d3 = V_del[v3_del] = sp.simplify(V_del[v3_del])/r  # /t1; a3 = a3.subs({B: B_form.subs({ncnc1: n_cnc1}),C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+    d4 = V_del[v4_del] = sp.simplify(V_del[v4_del])/r  # /t1; a4 = a4.subs({Bp: Bp_form.subs({ncnc1: n_cnc1}),C: C_form, w1: W1.subs({ncnc1: n_cnc1}),ncnc1: n_cnc1, w2: W2})
+
+
+    """ 
+    A partir de aca ya deberiamos tener solucion de v1 v2 v3 y v4 para u y r, t1 y t2, igualamos y solucionamos
+    el sistema 3x3
+    """
     sq2 = math.sqrt(2)
+    f1_ofi = sp.Eq(l1 * r - l2 * t1 - l3 * t2, -e1)
+    f2_ofi = sp.Eq(l4 * r - l5 * t1 - l6 * t2, -e2)
+    f3_ofi = sp.Eq(l7 * r - l8 * t1 - l9 * t2, -e3)
 
-    t_u = (2*sq2 - b1*G/sq2 - b2*Gp/sq2 - b3*Hp/sq2 - b4*H/sq2)/(G*a1 + Gp*a2 + Hp*a3 + H*a4)
+    Solution_ofi = sp.solve((f1_ofi,f2_ofi,f3_ofi), (r,t1,t2))
 
-    R = (Gp*(t_u*a1+b1/sq2) + G*(t_u*a2+b2/sq2) + H*(t_u*a3+b3/sq2) + Hp*(t_u*a4+b4/sq2))/(2*sq2)
+    R_ = sp.simplify(Solution_ofi[r])
+    T1 = sp.simplify(Solution_ofi[t1])
+    T2 = sp.simplify(Solution_ofi[t2])
+
+    R = R_.subs({e1 : sq2*g1 ,
+                 e2 : sq2*g2 ,
+                 e3 : sq2*g3 ,
+                 l1 : sq2*d1 ,
+                 l2 : a1 ,
+                 l3 : b1 ,
+                 l4 : sq2*d2 ,
+                 l5 : a2,
+                 l6 : b2,
+                 l7: sq2 * d3,
+                 l8: a3,
+                 l9: b3,
+                 w1: W1,
+                 w2: W2,
+                 })
+    R = R.subs({ncnc1: n_cnc1,})
+
+
+    # G = sp.sec(theta) - w2*sp.csc(theta); G = G.subs({w2: W2})
+    # Gp = sp.sec(theta) + w2*sp.csc(theta); Gp = Gp.subs({w2: W2})
+    # H = sp.sec(theta) - w1 * sp.csc(theta); H = H.subs({w1: W1.subs({ncnc1: n_cnc1})})
+    # Hp = sp.sec(theta) + w1 * sp.csc(theta); Hp = Hp.subs({w1: W1.subs({ncnc1: n_cnc1})})
+
+
+    # t_u = (2*sq2 - b1*G/sq2 - b2*Gp/sq2 - b3*Hp/sq2 - b4*H/sq2)/(G*a1 + Gp*a2 + Hp*a3 + H*a4)
+
+    # R = (Gp*(t_u*a1+b1/sq2) + G*(t_u*a2+b2/sq2) + H*(t_u*a3+b3/sq2) + Hp*(t_u*a4+b4/sq2))/(2*sq2)
 
     ncnc2_num = sp.lambdify((lam), n_cnc2_2, "numpy");ncnc2_arr = np.sqrt(ncnc2_num(spectrum) + 1j*0)
 
@@ -243,7 +310,8 @@ def find_amplitudes_LinPol(spectrum, n_medium, theta, width, pitch, eav, del_av)
 
     Reflection = R(spectrum, ncnc2_arr)
 
-    R1 = (np.abs(Reflection)) ** 2
+    R1 = (np.abs(np.conjugate(Reflection)*Reflection)) ** 2
+    R1 = R1/np.max(R1)
 
     return R1
 

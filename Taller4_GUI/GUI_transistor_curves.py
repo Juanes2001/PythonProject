@@ -106,7 +106,7 @@ class SerialGUI:
             self.ax.clear()
             self.ax.set_title("Waiting for data stream...")
             self.canvas.draw()
-            self.ser.write(b'DO_SWEEP\n')
+            self.ser.write(b'Do_sweep@')
             self.log_to_console(">> Sent: DO_SWEEP")
 
     def read_serial(self):
@@ -115,10 +115,11 @@ class SerialGUI:
             if self.ser and self.ser.in_waiting > 0:
                 try:
                     line = self.ser.readline().decode('utf-8', errors='replace').strip()
+                    self.log_to_console(line)
                     if not line: continue
 
                     # Check for end character to finish a curve
-                    if line == "END":
+                    if line == "||":
                         if self.current_curve_data:
                             self.curves.append((self.current_base_current, self.current_curve_data))
                         self.current_curve_data = []
@@ -130,7 +131,7 @@ class SerialGUI:
                     if len(parts) == 3:
                         try:
                             lbl, x, y = parts[0], float(parts[1]), float(parts[2])
-                            self.current_base_current = lbl
+                            self.current_base_current = lbl + "uA"
                             self.current_curve_data.append((x, y))
                         except ValueError:
                             # Not numbers? Log as message instead

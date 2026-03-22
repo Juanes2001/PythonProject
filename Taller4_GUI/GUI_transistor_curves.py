@@ -147,8 +147,8 @@ class SerialGUI:
         """Redraw the graph using stored curve arrays."""
         self.ax.clear()
         self.ax.set_title("Sweep Results")
-        self.ax.set_xlabel("X Axis")
-        self.ax.set_ylabel("Y Axis")
+        self.ax.set_xlabel("Vce [V]")
+        self.ax.set_ylabel("Ic [mA]")
         self.ax.grid(True)
 
         for label, data in self.curves:
